@@ -16,27 +16,25 @@ tabtitle = 'racecar'
 sourceurl = 'https://www.grammarly.com/blog/16-surprisingly-funny-palindromes/'
 githublink = 'https://github.com/plotly-dash-apps/202-palindrome-callbacks'
 
+# Load the trained model
+model = load_model('DVC2.h5',compile=True)
+
 
 ######## Define helper functions
 
-def parse_contents_a(contents, filename, date):
-    return html.Div([
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
-        # HTML images accept base64 encoded strings in the same format
-        # that is supplied by the upload
-        html.Img(src=contents),
-        html.Hr(),
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
-    ])
-
-
-def parse_contents(contents):
-    return html.Img(src=contents)
+def make_prediction(photo):
+    img = image.load_img(photo, target_size=(64, 64))
+    img = np.reshape(img,[1,64,64,3])
+    img = tf.cast(img, tf.float32)
+    img=img/255
+    y_pred = model.predict(img)
+    print(y_pred.shape)
+    print(y_pred)
+    classes = (y_pred>0.5).astype("int32")
+    if classes[0][0] == 1:
+        return "DOG"
+    else:
+        return "CAT"
 
 
 ########### Initiate the app
