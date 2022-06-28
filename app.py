@@ -12,16 +12,40 @@ sourceurl = 'https://www.grammarly.com/blog/16-surprisingly-funny-palindromes/'
 githublink = 'https://github.com/plotly-dash-apps/202-palindrome-callbacks'
 
 
+######## Define helper functions
+
+def parse_contents_a(contents, filename, date):
+    return html.Div([
+        html.H5(filename),
+        html.H6(datetime.datetime.fromtimestamp(date)),
+        # HTML images accept base64 encoded strings in the same format
+        # that is supplied by the upload
+        html.Img(src=contents),
+        html.Hr(),
+        html.Div('Raw Content'),
+        html.Pre(contents[0:200] + '...', style={
+            'whiteSpace': 'pre-wrap',
+            'wordBreak': 'break-all'
+        })
+    ])
+
+
+def parse_contents(contents):
+    return html.Img(src=contents)
+
+
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title=tabtitle
 
+
 ########### Set up the layout
 
 app.layout = html.Div([
     html.H1('This is the header'),
+    html.Img(id='top-image'),
     dcc.Upload(
         id='upload-image',
         children=html.Div([
@@ -38,38 +62,50 @@ app.layout = html.Div([
             'textAlign': 'center',
             'margin': '10px'
         },
-        # Allow multiple files to be uploaded
-        multiple=True
+        # DO NOT allow multiple files to be uploaded
+        multiple=False
     ),
+    html.Button(children='Taco Cat!', id='submit-val', n_clicks=0,
+                    style={
+                    'background-color': 'red',
+                    'color': 'white',
+                    'margin-left': '5px',
+                    'verticalAlign': 'center',
+                    'horizontalAlign': 'center'}
+                    ),
     html.Div(id='output-image-upload'),
+    html.Div(id='output-div'),
+    dcc.Store(id='intermediate-value')
 ])
 
-def parse_contents(contents, filename, date):
-    return html.Div([
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
 
-        # HTML images accept base64 encoded strings in the same format
-        # that is supplied by the upload
-        html.Img(src=contents),
-        html.Hr(),
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
-    ])
 
 @app.callback(Output('output-image-upload', 'children'),
+              Output('top-image', 'src'),
               Input('upload-image', 'contents'),
-              State('upload-image', 'filename'),
-              State('upload-image', 'last_modified'))
-def update_output(list_of_contents, list_of_names, list_of_dates):
-    if list_of_contents is not None:
-        children = [
-            parse_contents(c, n, d) for c, n, d in
-            zip(list_of_contents, list_of_names, list_of_dates)]
-        return children
+              )
+def update_output(contents):
+    # print(contents)
+    if contents is not None:
+        return html.Img(src=contents), contents
+    else:
+        return None, 'assets/cat.jpg'
+
+
+
+@app.callback(
+    Output(component_id='output-div', component_property='children'),
+    Input(component_id='submit-val', component_property='n_clicks'),
+    State(component_id='output-image-upload', component_property='children')
+)
+def update_output_div(clicks, input_value):
+
+    if clicks==0:
+        return "waiting for inputs"
+    if clicks==1:
+        return f"You've pressed the button {clicks} time"
+    else:
+        return f"You've pressed the button {clicks} times"
 
 ############ Deploy
 if __name__ == '__main__':
