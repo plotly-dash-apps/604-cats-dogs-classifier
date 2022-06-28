@@ -46,6 +46,7 @@ app.title=tabtitle
 app.layout = html.Div([
     html.H1('This is the header'),
     html.Img(id='top-image'),
+    html.Div(id='try-this'),
     dcc.Upload(
         id='upload-image',
         children=html.Div([
@@ -65,7 +66,8 @@ app.layout = html.Div([
         # DO NOT allow multiple files to be uploaded
         multiple=False
     ),
-    html.Button(children='Taco Cat!', id='submit-val', n_clicks=0,
+    html.Div(id='output-image-upload'),
+    html.Button(children='Submit', id='submit-val', n_clicks=0,
                     style={
                     'background-color': 'red',
                     'color': 'white',
@@ -73,23 +75,35 @@ app.layout = html.Div([
                     'verticalAlign': 'center',
                     'horizontalAlign': 'center'}
                     ),
-    html.Div(id='output-image-upload'),
     html.Div(id='output-div'),
     dcc.Store(id='intermediate-value')
 ])
 
 
-
 @app.callback(Output('output-image-upload', 'children'),
-              Output('top-image', 'src'),
+              # Output('top-image', 'src'),
+              Output('intermediate-value', 'data'),
               Input('upload-image', 'contents'),
               )
 def update_output(contents):
     # print(contents)
     if contents is not None:
-        return html.Img(src=contents), contents
+        # store_data = contents.to_json(date_format='iso', orient='split')
+        return html.Img(src=contents),  contents
     else:
-        return None, 'assets/cat.jpg'
+        return None, None
+
+
+@app.callback(Output('try-this', 'children'),
+              Input('intermediate-value', 'data')
+              )
+def update_output(contents):
+    # print(contents)
+    if contents is not None:
+        return str(contents)
+    else:
+        return 'waiting for inputs'
+
 
 
 
