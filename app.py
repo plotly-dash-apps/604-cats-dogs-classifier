@@ -1,13 +1,11 @@
-import datetime
 import dash
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output, State
 import base64
-import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-import cv2
+
 
 ########### Define your variables ######
 
@@ -32,7 +30,7 @@ def b64_jpg_converter(base64_string):
 
 def make_prediction(img_file):
     img = image.load_img(img_file, target_size=(64, 64))
-    img = np.reshape(img,[1,64,64,3])
+    img = tf.reshape(img,[1,64,64,3])
     img = tf.cast(img, tf.float32)
     img=img/255
     y_pred = model.predict(img)
