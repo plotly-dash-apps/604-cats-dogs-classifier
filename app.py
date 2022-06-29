@@ -15,6 +15,8 @@ sourceurl = 'https://www.kaggle.com/c/dogs-vs-cats'
 githublink = 'https://github.com/plotly-dash-apps/604-cats-dogs-classifier'
 
 # Load the trained model
+file = tarfile.open('model.tar.gz')
+file.extractall('DVC2.h5')
 model = load_model('DVC2.h5',compile=True)
 
 
