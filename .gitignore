@@ -1,6 +1,8 @@
 input/
 train/
 env/
+.DS_Store
+*.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
