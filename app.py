@@ -12,7 +12,7 @@ import cv2
 ########### Define your variables ######
 
 myheading1='Try out a palindrome here!'
-tabtitle = 'racecar'
+tabtitle = 'cats vs dogs'
 sourceurl = 'https://www.grammarly.com/blog/16-surprisingly-funny-palindromes/'
 githublink = 'https://github.com/plotly-dash-apps/202-palindrome-callbacks'
 
@@ -22,19 +22,17 @@ model = load_model('DVC2.h5',compile=True)
 
 ######## Define helper functions
 
-def make_prediction(photo):
-    img = image.load_img(photo, target_size=(64, 64))
+def make_prediction(img_b64):
+    img = image.load_img(img_b64, target_size=(64, 64))
     img = np.reshape(img,[1,64,64,3])
     img = tf.cast(img, tf.float32)
     img=img/255
-    y_pred = model.predict(img)
-    print(y_pred.shape)
-    print(y_pred)
+    y_pred = round(model.predict(img),4)
     classes = (y_pred>0.5).astype("int32")
     if classes[0][0] == 1:
-        return "DOG"
+        return f'DOG probability: {y_pred}'
     else:
-        return "CAT"
+        return f'CAT probability: {y_pred}'
 
 
 ########### Initiate the app
@@ -49,7 +47,7 @@ app.title=tabtitle
 app.layout = html.Div([
     html.H1('This is the header'),
     html.Img(id='top-image'),
-    html.Div(id='try-this'),
+    html.Div(id='base64-string'),
     dcc.Upload(
         id='upload-image',
         children=html.Div([
@@ -97,12 +95,13 @@ def update_output(contents):
         return None, None
 
 
-@app.callback(Output('try-this', 'children'),
+@app.callback(Output('base64-string', 'children'),
               Input('intermediate-value', 'data')
               )
 def update_output(contents):
     # print(contents)
     if contents is not None:
+        print('contents type: ',type(contents))
         return str(contents)
     else:
         return 'waiting for inputs'
@@ -113,16 +112,18 @@ def update_output(contents):
 @app.callback(
     Output(component_id='output-div', component_property='children'),
     Input(component_id='submit-val', component_property='n_clicks'),
-    State(component_id='output-image-upload', component_property='children')
+    State('intermediate-value', 'data')
 )
 def update_output_div(clicks, input_value):
 
     if clicks==0:
         return "waiting for inputs"
-    if clicks==1:
-        return f"You've pressed the button {clicks} time"
     else:
-        return f"You've pressed the button {clicks} times"
+        if input_value is not None:
+            return make_prediction(input_value)
+        else:
+            return "waiting for image"
+
 
 ############ Deploy
 if __name__ == '__main__':
