@@ -1,6 +1,6 @@
 # cats dogs classifier
 
-deployed app: https://cat-dog-classifier-tensorflow.herokuapp.com/
+deployed app: https://tensorflow-cat-dog-classifier.herokuapp.com/
 
 sources:
 - https://www.kaggle.com/competitions/dogs-vs-cats/overview
