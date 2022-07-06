@@ -1,5 +1,7 @@
-input/
+analysis/input/
+analysis/input/train/
 train/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
