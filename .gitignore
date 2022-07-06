@@ -1,6 +1,11 @@
 analysis/input/
 analysis/input/train/
 train/
+env/
+.DS_Store
+*.h5
+temp.jpg
+
 
 
 # Byte-compiled / optimized / DLL files
