@@ -1,10 +1,8 @@
-analysis/input/
-analysis/input/train/
-train/
+
 env/
 .DS_Store
-*.h5
-temp.jpg
+
+
 
 
 
