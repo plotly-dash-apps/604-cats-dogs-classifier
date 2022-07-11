@@ -1,2 +1,2 @@
-model_checkpoint_path: "modelrun_3epochs_weights"
-all_model_checkpoint_paths: "modelrun_3epochs_weights"
+model_checkpoint_path: "modelrun_3epochs_weightsB"
+all_model_checkpoint_paths: "modelrun_3epochs_weightsB"
