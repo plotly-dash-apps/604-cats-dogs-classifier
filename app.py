@@ -1,18 +1,15 @@
 import dash
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output, State
-import base64
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-import tarfile
 
+# https://stackoverflow.com/questions/67711358/valueerror-attempt-to-convert-a-value-none-with-an-unsupported-type-class/68049002#68049002
 
 ########### Define your variables ######
 
 tabtitle = 'cats vs dogs'
-sourceurl = 'https://www.kaggle.com/c/dogs-vs-cats'
-githublink = 'https://github.com/plotly-dash-apps/604-cats-dogs-classifier'
 
 # Load the trained model
 # file = tarfile.open('model.tar.gz')
@@ -22,14 +19,6 @@ model = load_model('DVC2.h5',compile=True)
 
 ######## Define helper functions
 
-
-def b64_jpg_converter(base64_string):
-    if 'base64,' in base64_string:
-        img_str=base64_string.split('base64,')[1]
-        imgdata = base64.b64decode(img_str)
-        filename = 'temp.jpg'  # I assume you have a way of picking unique filenames
-        with open(filename, 'wb') as f:
-            f.write(imgdata)
 
 def make_prediction(img_file):
     img = image.load_img(img_file, target_size=(64, 64))
@@ -57,25 +46,6 @@ app.title=tabtitle
 app.layout = html.Div([
     html.H1('Cats vs Dogs!'),
 
-    dcc.Upload(
-        id='upload-image',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        # DO NOT allow multiple files to be uploaded
-        multiple=False
-    ),
     html.Button(children='Submit', id='submit-val', n_clicks=0,
                     style={
                     'background-color': 'red',
@@ -85,54 +55,19 @@ app.layout = html.Div([
                     'horizontalAlign': 'center'}
                     ),
     html.Div(id='output-div'),
-    html.Div(id='output-image-upload'),
-    html.Div(id='base64-string'),
-    dcc.Store(id='intermediate-value'),
-    html.Br(),
-    html.A('Code on Github', href=githublink),
-    html.Br(),
-    html.A("Data Source", href=sourceurl),
+
 ])
-
-
-@app.callback(Output('output-image-upload', 'children'),
-              Output('intermediate-value', 'data'),
-              Input('upload-image', 'contents'))
-def update_output(contents):
-    if contents is not None:
-        b64_jpg_converter(contents)
-        return html.Img(src=contents, style={'height':'20%','width':'20%'}),  contents
-    else:
-        return None, None
-
-
-@app.callback(Output('base64-string', 'children'),
-              Input('intermediate-value', 'data'))
-def update_output(contents):
-    if contents is not None:
-        return str(contents)
-    else:
-        return 'waiting for inputs'
-
-
 
 @app.callback(
     Output(component_id='output-div', component_property='children'),
     Input(component_id='submit-val', component_property='n_clicks'),
-    State('intermediate-value', 'data'))
-def update_output_div(clicks, input_value):
+    )
+def update_output_div(clicks):
 
     if clicks==0:
         return "waiting for inputs"
     else:
-        if input_value is not None:
-            return make_prediction('temp.jpg')
-        else:
-            return "waiting for image"
-
-
-
-
+        return make_prediction('image/cat.jpg')
 
 
 ############ Deploy
