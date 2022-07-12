@@ -14,15 +14,15 @@ tabtitle = 'cats vs dogs'
 # Load the trained model
 # file = tarfile.open('model.tar.gz')
 # file.extractall('DVC2.h5')
-model = load_model('DVC2.h5',compile=True)
+model = load_model('analysis/model_outputs/modelrun_3epochs')
 
 
 ######## Define helper functions
 
 
 def make_prediction(img_file):
-    img = image.load_img(img_file, target_size=(64, 64))
-    img = tf.reshape(img,[1,64,64,3])
+    img = image.load_img(img_file, target_size=(128, 128))
+    img = tf.reshape(img,[1,128, 128,3])
     img = tf.cast(img, tf.float32)
     img=img/255
     y_pred = model.predict(img)
@@ -67,7 +67,7 @@ def update_output_div(clicks):
     if clicks==0:
         return "waiting for inputs"
     else:
-        return make_prediction('image/cat.jpg')
+        return make_prediction('analysis/image/cat.jpg')
 
 
 ############ Deploy
